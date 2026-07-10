@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f7fb" />
+    <title>秋招进度追踪</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">2026 AUTUMN RECRUITMENT</p>
+          <h1>秋招进度追踪</h1>
+          <p class="subtitle">记录每一次投递，也看见自己走了多远。</p>
+        </div>
+        <button class="primary-button header-add" type="button" data-action="add">
+          <span aria-hidden="true">＋</span> 添加记录
+        </button>
+      </header>
+
+      <section class="stats-grid" aria-label="投递统计">
+        <article class="stat-card stat-total">
+          <div class="stat-icon" aria-hidden="true">▤</div>
+          <div><p>总记录</p><strong id="stat-total">0</strong><span>全部申请</span></div>
+        </article>
+        <article class="stat-card stat-applied">
+          <div class="stat-icon" aria-hidden="true">↗</div>
+          <div><p>已投递</p><strong id="stat-applied">0</strong><span>等待反馈</span></div>
+        </article>
+        <article class="stat-card stat-progress">
+          <div class="stat-icon" aria-hidden="true">◎</div>
+          <div><p>笔试 / 面试中</p><strong id="stat-progress">0</strong><span>继续加油</span></div>
+        </article>
+        <article class="stat-card stat-offer">
+          <div class="stat-icon" aria-hidden="true">✓</div>
+          <div><p>Offer 数</p><strong id="stat-offer">0</strong><span>收获结果</span></div>
+        </article>
+      </section>
+
+      <section class="tracker-card">
+        <div class="toolbar">
+          <div class="filter-group">
+            <label class="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span class="sr-only">搜索公司或岗位</span>
+              <input id="search-input" type="search" placeholder="搜索公司 / 岗位..." autocomplete="off" />
+            </label>
+            <label>
+              <span class="sr-only">筛选状态</span>
+              <select id="status-filter">
+                <option value="all">所有状态</option>
+                <option value="待投递">待投递</option>
+                <option value="已投递">已投递</option>
+                <option value="笔试中">笔试中</option>
+                <option value="面试中">面试中</option>
+                <option value="综合评估中">综合评估中</option>
+                <option value="Offer">Offer</option>
+                <option value="已结束">已结束</option>
+              </select>
+            </label>
+            <label>
+              <span class="sr-only">筛选类型</span>
+              <select id="type-filter">
+                <option value="all">所有类型</option>
+                <option value="全职">全职</option>
+                <option value="实习">实习</option>
+                <option value="校招">校招</option>
+              </select>
+            </label>
+          </div>
+          <div class="toolbar-actions">
+            <button id="export-button" class="secondary-button" type="button">⇩ 导出 CSV</button>
+            <button class="primary-button toolbar-add" type="button" data-action="add">＋ 添加记录</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th><button class="sort-button" data-sort="company">公司 <span>↕</span></button></th>
+                <th><button class="sort-button" data-sort="role">岗位 <span>↕</span></button></th>
+                <th>类型</th>
+                <th>状态</th>
+                <th><button class="sort-button" data-sort="date">投递日期 <span>↕</span></button></th>
+                <th>面试进展</th>
+                <th>地点</th>
+                <th>投递入口</th>
+                <th>备注</th>
+                <th class="actions-heading">操作</th>
+              </tr>
+            </thead>
+            <tbody id="records-body"></tbody>
+          </table>
+          <div id="empty-state" class="empty-state" hidden>
+            <div aria-hidden="true">⌕</div>
+            <h2>没有找到记录</h2>
+            <p>换个关键词或筛选条件试试。</p>
+          </div>
+        </div>
+        <footer class="table-footer">
+          <span id="record-count">显示 0 条记录</span>
+          <span>数据仅保存在当前浏览器</span>
+        </footer>
+      </section>
+    </main>
+
+    <dialog id="record-dialog">
+      <form id="record-form" method="dialog">
+        <div class="dialog-header">
+          <div>
+            <p class="dialog-kicker">APPLICATION</p>
+            <h2 id="dialog-title">添加投递记录</h2>
+          </div>
+          <button class="icon-button" type="button" data-action="close" aria-label="关闭">×</button>
+        </div>
+        <input id="record-id" type="hidden" />
+        <div class="form-grid">
+          <label>公司名称 <em>*</em><input id="company" name="company" required maxlength="40" placeholder="例如：长江存储" /></label>
+          <label>岗位名称 <em>*</em><input id="role" name="role" required maxlength="60" placeholder="例如：模拟电路设计" /></label>
+          <label>求职类型
+            <select id="type" name="type"><option>全职</option><option>实习</option><option>校招</option></select>
+          </label>
+          <label>当前状态
+            <select id="status" name="status"><option>待投递</option><option selected>已投递</option><option>笔试中</option><option>面试中</option><option>综合评估中</option><option>Offer</option><option>已结束</option></select>
+          </label>
+          <label>投递日期 <input id="date" name="date" type="date" /></label>
+          <label>工作地点 <input id="location" name="location" maxlength="30" placeholder="例如：上海" /></label>
+          <label class="full-width">投递入口 <input id="website" name="website" type="text" maxlength="300" placeholder="https://... 或邮件投递" /></label>
+          <label class="full-width">面试进展 <input id="progress" name="progress" maxlength="80" placeholder="例如：完成一面，等待二面通知" /></label>
+          <label class="full-width">备注 <textarea id="notes" name="notes" maxlength="200" rows="3" placeholder="记录内推人、截止日期或其他信息"></textarea></label>
+        </div>
+        <div class="dialog-actions">
+          <button class="secondary-button" type="button" data-action="close">取消</button>
+          <button class="primary-button" type="submit">保存记录</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="delete-dialog" class="confirm-dialog">
+      <div class="confirm-icon" aria-hidden="true">!</div>
+      <h2>删除这条记录？</h2>
+      <p>删除后无法恢复，但不会影响其他投递记录。</p>
+      <div class="dialog-actions">
+        <button class="secondary-button" type="button" data-action="cancel-delete">取消</button>
+        <button id="confirm-delete" class="danger-button" type="button">确认删除</button>
+      </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js?v=10"></script>
+  </body>
+</html>
