@@ -1,6 +1,9 @@
 const STORAGE_KEY = "autumn-recruitment-tracker-v8";
 const DATA_REVISION_KEY = "autumn-recruitment-tracker-data-revision";
 const DATA_REVISION = 12;
+const RECORDS_URL = "records.json";
+const IS_LOCAL_ADMIN = ["127.0.0.1", "localhost"].includes(window.location.hostname);
+const PUBLIC_REFRESH_INTERVAL = 30_000;
 
 const sampleRecords = [
   { id: crypto.randomUUID(), company: "东芯半导体", role: "模拟电路工程师", type: "校招", status: "已投递", date: "2026-06-28", progress: "已投递简历", location: "上海", website: "https://www.dosilicon.com/", notes: "秋招提前批；校招多为邮件投递，留意邮件通知" },
@@ -46,7 +49,7 @@ const recordMigrations = {
 };
 
 const state = {
-  records: loadRecords(),
+  records: [],
   query: "",
   status: "all",
   type: "all",
@@ -65,20 +68,25 @@ const elements = {
   dialog: document.querySelector("#record-dialog"),
   form: document.querySelector("#record-form"),
   deleteDialog: document.querySelector("#delete-dialog"),
-  toast: document.querySelector("#toast")
+  toast: document.querySelector("#toast"),
+  syncStatus: document.querySelector("#sync-status")
 };
 
-function loadRecords() {
+async function loadRecords() {
   try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    const records = mergeSampleRecords(Array.isArray(stored) ? stored : []);
-    const currentRevision = Number(localStorage.getItem(DATA_REVISION_KEY) || 0);
-    const migrated = currentRevision < DATA_REVISION ? applyRecordMigrations(records) : records;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-    localStorage.setItem(DATA_REVISION_KEY, String(DATA_REVISION));
-    return migrated;
+    const response = await fetch(`${RECORDS_URL}?t=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`读取记录失败：${response.status}`);
+    const records = await response.json();
+    if (!Array.isArray(records)) throw new Error("记录数据格式错误");
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    return records;
   } catch {
-    return applyRecordMigrations(sampleRecords);
+    try {
+      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      return Array.isArray(stored) ? stored : [];
+    } catch {
+      return [];
+    }
   }
 }
 
@@ -101,8 +109,38 @@ function applyRecordMigrations(records) {
   });
 }
 
-function saveRecords() {
+async function saveRecords() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
+  if (!IS_LOCAL_ADMIN) return { saved: true, pushed: false };
+
+  setSyncStatus("正在同步到 GitHub…", "syncing");
+  try {
+    const response = await fetch("/api/records", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(state.records)
+    });
+    const result = await response.json();
+    if (!response.ok || !result.pushed) throw new Error(result.error || "同步失败");
+    setSyncStatus(result.changed ? `已同步 · ${result.commit}` : "已同步 · 无变更", "synced");
+    return result;
+  } catch (error) {
+    setSyncStatus("本地已保存 · GitHub 同步失败", "error");
+    throw error;
+  }
+}
+
+function setSyncStatus(message, status = "") {
+  elements.syncStatus.textContent = message;
+  elements.syncStatus.dataset.status = status;
+}
+
+function configureAccessMode() {
+  document.body.classList.toggle("read-only", !IS_LOCAL_ADMIN);
+  document.querySelectorAll('[data-action="add"]').forEach((button) => {
+    button.hidden = !IS_LOCAL_ADMIN;
+  });
+  setSyncStatus(IS_LOCAL_ADMIN ? "本地管理模式 · 保存后自动同步 GitHub" : "公开只读视图 · 每 30 秒检查更新");
 }
 
 function escapeHtml(value = "") {
@@ -138,6 +176,12 @@ function render() {
   const records = filteredRecords();
   elements.body.innerHTML = records.map((record) => {
     const website = safeWebsiteUrl(record.website);
+    const actions = IS_LOCAL_ADMIN
+      ? `<div class="row-actions">
+          <button class="text-button" type="button" data-action="edit" data-id="${record.id}">编辑</button>
+          <button class="text-button delete" type="button" data-action="delete" data-id="${record.id}">删除</button>
+        </div>`
+      : `<span class="read-only-label">只读</span>`;
     return `
     <tr>
       <td class="company-cell" title="${escapeHtml(record.company)}">${escapeHtml(record.company)}</td>
@@ -149,10 +193,7 @@ function render() {
       <td title="${escapeHtml(record.location)}">${escapeHtml(record.location || "—")}</td>
       <td>${website ? `<a class="website-link" href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer">打开官网 ↗</a>` : escapeHtml(record.website || "—")}</td>
       <td title="${escapeHtml(record.notes)}">${escapeHtml(record.notes || "—")}</td>
-      <td><div class="row-actions">
-        <button class="text-button" type="button" data-action="edit" data-id="${record.id}">编辑</button>
-        <button class="text-button delete" type="button" data-action="delete" data-id="${record.id}">删除</button>
-      </div></td>
+      <td>${actions}</td>
     </tr>`;
   }).join("");
 
@@ -186,7 +227,7 @@ function openForm(record = null) {
   setTimeout(() => document.querySelector("#company").focus(), 50);
 }
 
-function handleSubmit(event) {
+async function handleSubmit(event) {
   event.preventDefault();
   const id = document.querySelector("#record-id").value;
   const record = { id: id || crypto.randomUUID() };
@@ -196,10 +237,14 @@ function handleSubmit(event) {
   const existingIndex = state.records.findIndex((item) => item.id === id);
   if (existingIndex >= 0) state.records[existingIndex] = record;
   else state.records.unshift(record);
-  saveRecords();
   elements.dialog.close();
   render();
-  showToast(existingIndex >= 0 ? "记录已更新" : "记录已添加");
+  try {
+    await saveRecords();
+    showToast(existingIndex >= 0 ? "记录已更新并同步" : "记录已添加并同步");
+  } catch (error) {
+    showToast(`记录已保存到本地：${error.message}`);
+  }
 }
 
 function requestDelete(id) {
@@ -207,13 +252,17 @@ function requestDelete(id) {
   elements.deleteDialog.showModal();
 }
 
-function confirmDelete() {
+async function confirmDelete() {
   state.records = state.records.filter((record) => record.id !== state.pendingDeleteId);
   state.pendingDeleteId = null;
-  saveRecords();
   elements.deleteDialog.close();
   render();
-  showToast("记录已删除");
+  try {
+    await saveRecords();
+    showToast("记录已删除并同步");
+  } catch (error) {
+    showToast(`记录已从本地删除：${error.message}`);
+  }
 }
 
 function exportCsv() {
@@ -261,4 +310,21 @@ document.querySelectorAll(".sort-button").forEach((button) => button.addEventLis
   render();
 }));
 
-render();
+async function refreshPublicRecords() {
+  const previous = JSON.stringify(state.records);
+  const latest = await loadRecords();
+  if (JSON.stringify(latest) !== previous) {
+    state.records = latest;
+    render();
+    showToast("投递记录已自动更新");
+  }
+}
+
+async function initialize() {
+  configureAccessMode();
+  state.records = await loadRecords();
+  render();
+  if (!IS_LOCAL_ADMIN) setInterval(refreshPublicRecords, PUBLIC_REFRESH_INTERVAL);
+}
+
+initialize();
