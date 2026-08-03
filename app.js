@@ -1,4 +1,6 @@
 const STORAGE_KEY = "autumn-recruitment-tracker-v8";
+const DATA_REVISION_KEY = "autumn-recruitment-tracker-data-revision";
+const DATA_REVISION = 10;
 
 const sampleRecords = [
   { id: crypto.randomUUID(), company: "东芯半导体", role: "模拟电路工程师", type: "校招", status: "已投递", date: "2026-06-28", progress: "已投递简历", location: "上海", website: "https://www.dosilicon.com/", notes: "秋招提前批；校招多为邮件投递，留意邮件通知" },
@@ -8,20 +10,34 @@ const sampleRecords = [
   { id: crypto.randomUUID(), company: "海信", role: "模拟电路工程师", type: "校招", status: "已投递", date: "2026-06-27", progress: "已投递简历", location: "青岛", website: "https://jobs.hisense.com", notes: "秋招提前批" },
   { id: crypto.randomUUID(), company: "禾赛科技", role: "模拟 IC 设计", type: "校招", status: "已投递", date: "2026-06-27", progress: "已投递简历", location: "上海", website: "https://www.hesaitech.com/cn/careers", notes: "秋招提前批" },
   { id: crypto.randomUUID(), company: "澜起科技", role: "模拟设计工程师", type: "校招", status: "已投递", date: "2026-06-28", progress: "已投递简历", location: "昆山", website: "https://www.montage-tech.com/cn/Campus_Recruitment", notes: "秋招提前批" },
-  { id: crypto.randomUUID(), company: "乐鑫半导体", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-07-04", progress: "已投递简历", location: "上海", website: "https://www.espressif.com/zh-hans/join-us/job-search", notes: "最新投递" },
+  { id: crypto.randomUUID(), company: "乐鑫半导体", role: "模拟 IC 设计工程师", type: "校招", status: "已结束", date: "2026-07-04", progress: "简历筛选未通过", location: "上海", website: "https://www.espressif.com/zh-hans/join-us/job-search", notes: "简历筛选未通过，流程结束" },
   { id: crypto.randomUUID(), company: "思瑞浦", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-07-04", progress: "已投递简历", location: "上海", website: "https://www.3peak.com/careers", notes: "最新投递；完成投递后留意邮件通知" },
+  { id: crypto.randomUUID(), company: "纳芯微", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-07-18", progress: "已投递简历", location: "", website: "https://careers.novosns.com/campus", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "芯迈半导体", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-07-20", progress: "已投递简历", location: "", website: "https://www.silicon-magic.com/joinus", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "兆易创新", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-07-29", progress: "已投递简历", location: "", website: "https://www.gigadevice.com.cn/about/career", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "南芯科技", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-07-30", progress: "已投递简历", location: "上海", website: "https://www.southchip.com/recruitment", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "圣邦微电子", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-07-30", progress: "已投递简历", location: "", website: "https://www.sg-micro.com/cn/recruitment", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "芯原股份", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-07-30", progress: "已投递简历", location: "上海", website: "https://www.verisilicon.com/recruit/RecruitCampus.html", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "中兴微电子", role: "模拟电路工程师", type: "校招", status: "已投递", date: "2026-07-31", progress: "已投递简历", location: "深圳", website: "https://www.sanechips.com.cn/", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "艾为电子", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "上海", website: "https://awinic1.zhiye.com/", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "大疆", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "深圳", website: "https://careers.dji.com/zh-CN/campus", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "联发科", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "上海", website: "https://mediatek.zhiye.com/campus", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "RoboSense 速腾聚创", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "深圳", website: "https://www.robosense.ai/about/joinus", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "昂瑞微", role: "模拟研发工程师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "北京 / 大连", website: "https://www.onmicro.com.cn/xyzp/230.html", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "中茵微电子", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "", website: "https://www.joinsilicon.com/", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "士兰微电子", role: "模拟 IC 设计师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "", website: "https://www.silan.com.cn/about/post.html", notes: "2027 届秋招" },
   { id: crypto.randomUUID(), company: "长江存储", role: "模拟电路设计", type: "校招", status: "已投递", date: "2026-06-19", progress: "已完成 AI 测评，等待笔试/面试", location: "上海", website: "https://ymtc-campus.zhiye.com/", notes: "秋招提前批" },
   { id: crypto.randomUUID(), company: "长鑫存储", role: "模拟电路", type: "校招", status: "综合评估中", date: "2026-07-04", progress: "已进入综合评估中", location: "上海", website: "https://jobs.cxmt.com/Campus", notes: "秋招提前批" },
   { id: crypto.randomUUID(), company: "中兴通讯", role: "模拟电路工程师", type: "校招", status: "已投递", date: "2026-07-01", progress: "已投递简历", location: "上海", website: "https://job.zte.com.cn/cn/campus-recruitment/Recruitment_positions/freshstudent.html", notes: "最新投递" },
   { id: crypto.randomUUID(), company: "紫光同创", role: "模拟电路工程师", type: "校招", status: "面试中", date: "2026-06-24", progress: "已收到面试通知（邮件）", location: "上海", website: "https://www.pangomicro.com/join_school/", notes: "秋招提前批；面试通知来自邮件" }
 ];
 
-const forcedRecordUpdates = {
+const recordMigrations = {
   东芯半导体: { website: "https://www.dosilicon.com/", notes: "秋招提前批；校招多为邮件投递，留意邮件通知" },
   高德红外: { website: "https://www.wuhan-guide.com/company-culture/" },
   格见半导体: { website: "https://gejian-semi.zhiye.com/" },
   澜起科技: { website: "https://www.montage-tech.com/cn/Campus_Recruitment" },
-  乐鑫半导体: { website: "https://www.espressif.com/zh-hans/join-us/job-search" },
+  乐鑫半导体: { status: "已结束", progress: "简历筛选未通过", website: "https://www.espressif.com/zh-hans/join-us/job-search", notes: "简历筛选未通过，流程结束" },
   思瑞浦: { website: "https://www.3peak.com/careers" },
   长江存储: { website: "https://ymtc-campus.zhiye.com/" },
   长鑫存储: { status: "综合评估中", date: "2026-07-04", progress: "已进入综合评估中", website: "https://jobs.cxmt.com/Campus" },
@@ -55,12 +71,14 @@ const elements = {
 function loadRecords() {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!Array.isArray(stored)) return sampleRecords;
-    const migrated = mergeSampleRecords(stored);
+    const records = mergeSampleRecords(Array.isArray(stored) ? stored : []);
+    const currentRevision = Number(localStorage.getItem(DATA_REVISION_KEY) || 0);
+    const migrated = currentRevision < DATA_REVISION ? applyRecordMigrations(records) : records;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+    localStorage.setItem(DATA_REVISION_KEY, String(DATA_REVISION));
     return migrated;
   } catch {
-    return sampleRecords;
+    return applyRecordMigrations(sampleRecords);
   }
 }
 
@@ -72,10 +90,15 @@ function mergeSampleRecords(records) {
       merged.push(sample);
       return;
     }
-    const forcedUpdate = forcedRecordUpdates[sample.company];
-    if (forcedUpdate) merged[index] = { ...merged[index], ...forcedUpdate };
   });
   return merged;
+}
+
+function applyRecordMigrations(records) {
+  return records.map((record) => {
+    const update = recordMigrations[record.company];
+    return update ? { ...record, ...update } : record;
+  });
 }
 
 function saveRecords() {
