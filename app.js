@@ -1,6 +1,6 @@
 const STORAGE_KEY = "autumn-recruitment-tracker-v8";
 const DATA_REVISION_KEY = "autumn-recruitment-tracker-data-revision";
-const DATA_REVISION = 12;
+const DATA_REVISION = 13;
 const RECORDS_URL = "records.json";
 const IS_LOCAL_ADMIN = ["127.0.0.1", "localhost"].includes(window.location.hostname);
 const PUBLIC_REFRESH_INTERVAL = 30_000;
@@ -29,6 +29,10 @@ const sampleRecords = [
   { id: crypto.randomUUID(), company: "昂瑞微", role: "模拟研发工程师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "北京 / 大连", website: "https://www.onmicro.com.cn/xyzp/230.html", notes: "2027 届秋招" },
   { id: crypto.randomUUID(), company: "中茵微电子", role: "模拟 IC 设计工程师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "", website: "https://www.joinsilicon.com/", notes: "2027 届秋招" },
   { id: crypto.randomUUID(), company: "士兰微电子", role: "模拟 IC 设计师", type: "校招", status: "已投递", date: "2026-08-02", progress: "已投递简历", location: "", website: "https://www.silan.com.cn/about/post.html", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "紫光国芯", role: "模拟设计工程师", type: "校招", status: "待投递", date: "", progress: "简历已准备，待投递", location: "西安", website: "https://www.unisemicon.com/index.php?a=lists&c=index&catid=28&m=content", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "中科芯", role: "模拟 IC 设计工程师", type: "校招", status: "待投递", date: "", progress: "简历已准备，待投递", location: "", website: "https://cksic.zhiye.com/campus", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "MPS芯源", role: "模拟 IC 设计工程师", type: "校招", status: "待投递", date: "", progress: "简历已准备，待投递", location: "", website: "https://xz.51job.com/mps/list4.html", notes: "2027 届秋招" },
+  { id: crypto.randomUUID(), company: "星宸科技", role: "模拟 IC 设计工程师", type: "校招", status: "待投递", date: "", progress: "待自行投递", location: "上海 / 厦门", website: "https://sigmastar.zhiye.com/campus/jobs", notes: "2027 届秋招；上海 J10573 / 厦门 J10574" },
   { id: crypto.randomUUID(), company: "长江存储", role: "模拟电路设计", type: "校招", status: "面试中", date: "2026-06-19", progress: "二面复试已完成，等待结果", location: "上海", website: "https://ymtc-campus.zhiye.com/", notes: "秋招提前批" },
   { id: crypto.randomUUID(), company: "长鑫存储", role: "模拟电路", type: "校招", status: "综合评估中", date: "2026-07-04", progress: "已进入综合评估中", location: "上海", website: "https://jobs.cxmt.com/Campus", notes: "秋招提前批" },
   { id: crypto.randomUUID(), company: "中兴通讯", role: "模拟电路工程师", type: "校招", status: "已投递", date: "2026-07-01", progress: "已完成测评，等待后续通知", location: "上海", website: "https://job.zte.com.cn/cn/campus-recruitment/Recruitment_positions/freshstudent.html", notes: "秋招提前批" },
