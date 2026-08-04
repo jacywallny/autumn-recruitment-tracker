@@ -336,6 +336,30 @@
     "notes": "2027 届校园招聘；职位 ID：A115240；正式 / 研发-硬件"
   },
   {
+    "id": "shengyu-tech",
+    "company": "升宇科技",
+    "role": "模拟 IC 设计工程师",
+    "type": "校招",
+    "status": "待投递",
+    "date": "",
+    "progress": "待确认岗位后投递",
+    "location": "北京",
+    "website": "https://mp.weixin.qq.com/s/c6ybVk47TULMgVVrL2zZ8A",
+    "notes": "微信公众号招聘信息；岗位名称、批次和截止时间待打开页面确认"
+  },
+  {
+    "id": "united-imaging",
+    "company": "联影集团",
+    "role": "模拟设计工程师",
+    "type": "校招",
+    "status": "待投递",
+    "date": "",
+    "progress": "待确认正式岗位后投递",
+    "location": "上海 / 武汉 / 深圳",
+    "website": "https://global.united-imaging.com/zh-cn/careers",
+    "notes": "2027 届招聘方向含模拟设计、芯片应用、射频、传感器等；优先核对正式秋招入口"
+  },
+  {
     "id": "ymtc",
     "company": "长江存储",
     "role": "模拟电路设计",
