@@ -28,12 +28,12 @@
     "company": "歌尔微电子",
     "role": "模拟电路工程师",
     "type": "校招",
-    "status": "已投递",
-    "date": "2026-06-25",
-    "progress": "已投递简历",
+    "status": "待投递",
+    "date": "",
+    "progress": "简历已准备，待投递",
     "location": "青岛",
     "website": "https://campus.goertek.com",
-    "notes": "秋招提前批"
+    "notes": "秋招提前批；公司目录已有简历，尚未确认提交"
   },
   {
     "id": "gejian-semi",
@@ -79,9 +79,9 @@
     "status": "已投递",
     "date": "2026-06-28",
     "progress": "已投递简历",
-    "location": "昆山",
-    "website": "https://www.montage-tech.com/cn/Campus_Recruitment",
-    "notes": "秋招提前批"
+    "location": "昆山 / 南京",
+    "website": "https://www.moseeker.com/positions/index/cid/8721227",
+    "notes": "秋招职位页；模拟设计工程师地点为昆山、南京；另有数字设计、数字验证、产品工程师岗位"
   },
   {
     "id": "espressif",
