@@ -360,6 +360,18 @@
     "notes": "2027 届招聘方向含模拟设计、芯片应用、射频、传感器等；优先核对正式秋招入口"
   },
   {
+    "id": "chipown",
+    "company": "芯朋微电子",
+    "role": "模拟 IC 设计工程师",
+    "type": "校招",
+    "status": "待投递",
+    "date": "",
+    "progress": "待投递",
+    "location": "无锡 / 苏州 / 上海",
+    "website": "https://www.chipown.com.cn/cn/jobxylist/213.html",
+    "notes": "2027 届校招；岗位于 2026-07-31 发布；学历要求硕士/博士"
+  },
+  {
     "id": "ymtc",
     "company": "长江存储",
     "role": "模拟电路设计",
